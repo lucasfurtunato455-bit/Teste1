@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeRunning - Transforme Passos em Pontos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(0, 0, 20, 0.85);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header {
+            background: rgba(0, 0, 30, 0.9);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #4a00e0;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        header p {
+            color: #a0c8ff;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .stats-panel {
+            flex: 1;
+            background: rgba(10, 20, 50, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .stats-card {
+            background: rgba(20, 40, 80, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stats-card h3 {
+            color: #4cc9f0;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .stats-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(50, 50, 100, 0.8);
+            color: #a0c8ff;
+            border: 1px solid #4a00e0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 210, 255, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .assistant-panel {
+            flex: 2;
+            background: rgba(10, 20, 50, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .assistant-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .assistant-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
+        }
+        
+        .assistant-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: #4cc9f0;
+        }
+        
+        .assistant-info p {
+            color: #a0c8ff;
+            font-style: italic;
+        }
+        
+        .chat-container {
+            flex: 1;
+            background: rgba(5, 10, 30, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 300px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .assistant-message {
+            background: rgba(30, 60, 120, 0.9);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            position: relative;
+        }
+        
+        .assistant-message::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid rgba(30, 60, 120, 0.9);
+        }
+        
+        .user-message {
+            background: rgba(80, 40, 120, 0.9);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            background: rgba(20, 30, 60, 0.8);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        #user-input::placeholder {
+            color: #a0c8ff;
+        }
+        
+        #send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 210, 255, 0.4);
+        }
+        
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .achievement {
+            background: rgba(20, 40, 80, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .achievement.locked {
+            opacity: 0.5;
+        }
+        
+        .achievement i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        .achievement h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #4cc9f0;
+        }
+        
+        .achievement p {
+            font-size: 0.9rem;
+            color: #a0c8ff;
+        }
+        
+        .map-container {
+            height: 200px;
+            background: rgba(5, 10, 30, 0.8);
+            border-radius: 15px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .map-placeholder {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .map-placeholder i {
+            font-size: 3rem;
+            color: #3a7bd5;
+            margin-bottom: 15px;
+        }
+        
+        .gps-status {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .gps-status.active {
+            color: #00ff9d;
+        }
+        
+        .gps-status.inactive {
+            color: #ff4d4d;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 30, 0.9);
+            color: #a0c8ff;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .achievements {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-running"></i> LifeRunning</h1>
+            <p>Transforme seus passos em pontos! Caminhe na vida real e colete recompensas virtuais.</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="stats-panel">
+                <div class="stats-card">
+                    <h3>Distância Percorrida</h3>
+                    <div class="stats-value" id="distance">0.00 km</div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Pontos Acumulados</h3>
+                    <div class="stats-value" id="points">0</div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Passos Hoje</h3>
+                    <div class="stats-value" id="steps">0</div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="start-btn">
+                        <i class="fas fa-play"></i> Iniciar Corrida
+                    </button>
+                    <button class="btn btn-secondary" id="stop-btn" disabled>
+                        <i class="fas fa-pause"></i> Pausar
+                    </button>
+                </div>
+                
+                <div class="achievements">
+                    <div class="achievement">
+                        <i class="fas fa-medal"></i>
+                        <h4>Primeiros Passos</h4>
+                        <p>Ande 1 km</p>
+                    </div>
+                    <div class="achievement locked">
+                        <i class="fas fa-trophy"></i>
+                        <h4>Maratonista</h4>
+                        <p>Ande 5 km</p>
+                    </div>
+                    <div class="achievement locked">
+                        <i class="fas fa-crown"></i>
+                        <h4>Lenda</h4>
+                        <p>Ande 10 km</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="assistant-panel">
+                <div class="assistant-header">
+                    <div class="assistant-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="assistant-info">
+                        <h2>Assistente Fit</h2>
+                        <p>Sua companhia para uma vida mais saudável</p>
+                    </div>
+                </div>
+                
+                <div class="chat-container" id="chat-container">
+                    <div class="message assistant-message">
+                        Olá! Eu sou seu Assistente Fit. Vamos começar? Clique em "Iniciar Corrida" para transformar seus passos em pontos!
+                    </div>
+                    <div class="message assistant-message">
+                        Para cada 100 metros que você caminhar, você ganhará 10 pontos! Vamos atingir novos objetivos juntos.
+                    </div>
+                </div>
+                
+                <div class="input-area">
+                    <input type="text" id="user-input" placeholder="Pergunte algo ao seu assistente...">
+                    <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                
+                <div class="map-container">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <p>Seu trajeto será mostrado aqui quando você começar a caminhar</p>
+                    </div>
+                    <div class="gps-status inactive">
+                        <i class="fas fa-satellite"></i>
+                        <span>GPS Inativo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>LifeRunning &copy; 2023 | Transformando passos em conquistas</p>
+            <p>Para melhores resultados, permita o acesso à localização e leve seu dispositivo durante as caminhadas</p>
+        </footer>
+    </div>
+
+    <script>
+        // Elementos DOM
+        const distanceElement = document.getElementById('distance');
+        const pointsElement = document.getElementById('points');
+        const stepsElement = document.getElementById('steps');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const gpsStatus = document.querySelector('.gps-status');
+        
+        // Dados do jogo
+        let gameData = {
+            distance: 0, // em metros
+            points: 0,
+            steps: 0,
+            isRunning: false,
+            watchId: null,
+            lastPosition: null
+        };
+        
+        // Assistente de IA - Respostas pré-definidas
+        const assistantResponses = {
+            greetings: ["Olá! Como posso ajudar?", "Oi! Pronto para caminhar?", "Olá! Vamos acumular pontos?"],
+            motivation: [
+                "Continue assim! Cada passo te deixa mais saudável!",
+                "Você está indo muito bem! Não pare agora!",
+                "A caminhada de mil quilômetros começa com um único passo!",
+                "Seu progresso é inspirador! Vamos continuar!"
+            ],
+            points: [
+                "Você ganha 10 pontos a cada 100 metros caminhados!",
+                "Seus pontos aumentam com a distância percorrida.",
+                "Quanto mais você caminha, mais pontos você acumula!"
+            ],
+            distance: [
+                "Sua distância atual é de ${distance} km.",
+                "Você já caminhou ${distance} quilômetros! Incrível!",
+                "Até agora, você percorreu ${distance} km."
+            ],
+            achievements: [
+                "Conquistas são desbloqueadas ao atingir marcos de distância!",
+                "Verifique a seção de conquistas para ver seu progresso!",
+                "Novas conquistas serão desbloqueadas conforme você caminha."
+            ],
+            default: [
+                "Como seu assistente de fitness, estou aqui para motivá-lo!",
+                "Vamos focar em caminhar mais hoje?",
+                "Lembre-se: movimento é vida! Vamos caminhar?",
+                "Sua saúde agradece cada passo que você dá!"
+            ]
+        };
+        
+        // Função para atualizar a interface com os dados do jogo
+        function updateUI() {
+            distanceElement.textContent = (gameData.distance / 1000).toFixed(2);
+            pointsElement.textContent = gameData.points;
+            stepsElement.textContent = gameData.steps;
+            
+            // Atualizar conquistas
+            updateAchievements();
+        }
+        
+        // Função para atualizar conquistas
+        function updateAchievements() {
+            const achievements = document.querySelectorAll('.achievement');
+            const distanceKm = gameData.distance / 1000;
+            
+            achievements[0].classList.toggle('locked', distanceKm < 1);
+            achievements[1].classList.toggle('locked', distanceKm < 5);
+            achievements[2].classList.toggle('locked', distanceKm < 10);
+        }
+        
+        // Função para adicionar mensagem ao chat
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'assistant-message');
+            messageDiv.textContent = text;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Função para gerar resposta do assistente
+        function generateResponse(input) {
+            input = input.toLowerCase();
+            
+            // Respostas específicas
+            if (input.includes("oi") || input.includes("olá") || input.includes("bom dia")) {
+                return assistantResponses.greetings[Math.floor(Math.random() * assistantResponses.greetings.length)];
+            }
+            
+            if (input.includes("pontos") || input.includes("pontuação")) {
+                return assistantResponses.points[Math.floor(Math.random() * assistantResponses.points.length)];
+            }
+            
+            if (input.includes("distância") || input.includes("quanto andei")) {
+                const response = assistantResponses.distance[Math.floor(Math.random() * assistantResponses.distance.length)];
+                return response.replace("${distance}", (gameData.distance / 1000).toFixed(2));
+            }
+            
+            if (input.includes("conquista") || input.includes("medalha")) {
+                return assistantResponses.achievements[Math.floor(Math.random() * assistantResponses.achievements.length)];
+            }
+            
+            // Resposta padrão
+            return assistantResponses.default[Math.floor(Math.random() * assistantResponses.default.length)];
+        }
+        
+        // Função para iniciar a corrida
+        function startRunning() {
+            if (gameData.isRunning) return;
+            
+            gameData.isRunning = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            
+            // Simulação de dados GPS
+            gpsStatus.classList.remove('inactive');
+            gpsStatus.classList.add('active');
+            gpsStatus.innerHTML = '<i class="fas fa-satellite"></i> <span>GPS Ativo</span>';
+            
+            // Adicionar mensagem do assistente
+            addMessage("Corrida iniciada! Vamos nessa! Cada passo conta!");
+            
+            // Simulação de caminhada
+            gameData.watchId = setInterval(() => {
+                // Simular movimento (10-30 metros a cada 3 segundos)
+                const distanceIncrement = 10 + Math.random() * 20;
+                gameData.distance += distanceIncrement;
+                
+                // Calcular pontos (10 pontos por 100m)
+                gameData.points += Math.floor(distanceIncrement / 10);
+                
+                // Calcular passos (aproximadamente 1 passo por 0.7m)
+                gameData.steps += Math.floor(distanceIncrement / 0.7);
+                
+                updateUI();
+                
+                // Mensagens motivacionais ocasionais
+                if (Math.random() < 0.1) {
+                    const motivation = assistantResponses.motivation[
+                        Math.floor(Math.random() * assistantResponses.motivation.length)
+                    ];
+                    addMessage(motivation);
+                }
+            }, 3000);
+        }
+        
+        // Função para parar a corrida
+        function stopRunning() {
+            if (!gameData.isRunning) return;
+            
+            gameData.isRunning = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            
+            gpsStatus.classList.remove('active');
+            gpsStatus.classList.add('inactive');
+            gpsStatus.innerHTML = '<i class="fas fa-satellite"></i> <span>GPS Inativo</span>';
+            
+            clearInterval(gameData.watchId);
+            addMessage("Corrida pausada. Você pode continuar quando quiser!");
+        }
+        
+        // Event Listeners
+        startBtn.addEventListener('click', startRunning);
+        stopBtn.addEventListener('click', stopRunning);
+        
+        sendBtn.addEventListener('click', () => {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                userInput.value = '';
+                
+                // Gerar e exibir resposta após um pequeno delay
+                setTimeout(() => {
+                    const response = generateResponse(message);
+                    addMessage(response);
+                }, 1000);
+            }
+        });
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+        
+        // Mensagem inicial do assistente
+        setTimeout(() => {
+            addMessage("Dica: Você pode me perguntar sobre pontos, distância ou conquistas!");
+        }, 3000);
+        
+        // Inicialização
+        updateUI();
+    </script>
+</body>
+</html>
